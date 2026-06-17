@@ -3,17 +3,29 @@
 像素风格多分身 AI 助手实时监控面板。支持四个分身（默认助手 / PM / 研发经理 / CC研发）状态追踪、行为可视化、Metrics 统计。
 
 ![Hermes Monitor 预览图](./docs/screenshot.png)
-<!-- 请将 /tmp/hermes_monitor_screenshot.png 替换为你的实际截图 -->
 
 ## 功能特性
 
 ### 🖥️ 像素画布可视化
-- 实时渲染四个分身的工位、床位、休息区动态
-- 角色行为动画：编码、评审、会议、休息、睡觉
-- 昼夜灯光系统：工作时段（08:00-21:00）、睡眠窗口（21:00-08:00）
-- 联合事件系统：多人协作场景（评审、对齐、调 Bug）
+实时渲染四个分身的工位、床位、休息区动态。角色行为动画：编码、评审、会议、休息、睡觉。昼夜灯光系统：工作时段（08:00-21:00）、睡眠窗口（21:00-08:00）。
+
+**单人事件 — 踱步：**
+![Persona Walking Event](./docs/features/01-walking-event.png)
+
+**单人事件 — 喝咖啡：**
+![Persona Coffee Event](./docs/features/02-coffee-event.png)
+
+**工作中：**
+![Persona Working](./docs/features/04-working.png)
+
+### 🤝 联合多人事件
+评审、对齐、调 Bug — 多个分身实时互动协作。
+
+**多人评审中：**
+![Multi-Persona Review Event](./docs/features/03-review-event.png)
 
 ### 📊 多分身支持
+
 | 分身 | Profile ID | 说明 |
 |------|-----------|------|
 | 默认助手 | `default` | 默认 gateway |
@@ -136,6 +148,13 @@ hermes-monitor/
 │       └── pm.yaml
 ├── scripts/
 │   └── restore.sh                  # 数据恢复脚本
+├── docs/
+│   ├── screenshot.png             # 主面板截图
+│   └── features/                  # 功能截图
+│       ├── 01-walking-event.png  # 踱步事件
+│       ├── 02-coffee-event.png   # 喝咖啡事件
+│       ├── 03-review-event.png   # 评审事件
+│       └── 04-working.png         # 工作中
 ├── .env.template
 ├── config.yaml.template
 └── README.md
@@ -228,14 +247,6 @@ ls monitor/SPEC-*.md
 # v19 → v20 → v21 → v22
 # v21-M1 ~ v21-M5 为 v21 的子里程碑
 ```
-
-## 截图说明
-
-面板截图保存在 `docs/screenshot.png`。获取方法：
-
-1. 打开监控面板 `http://localhost:8899/`
-2. 使用浏览器截图工具（Ctrl+Shift+S 或截图按钮）
-3. 保存为 `docs/screenshot.png`
 
 ## License
 

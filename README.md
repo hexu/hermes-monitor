@@ -3,17 +3,29 @@
 Pixel-style multi-persona AI assistant real-time monitoring dashboard. Supports four personas (default / PM / Tech Lead / CC Dev) with status tracking, behavior visualization, and Metrics statistics.
 
 ![Hermes Monitor Preview](./docs/screenshot.png)
-<!-- Replace with your own screenshot: /tmp/hermes_monitor_screenshot.png -->
 
 ## Features
 
 ### 🖥️ Pixel Office Visualization
-- Real-time rendering of four personas at workstations, beds, rest areas
-- Dynamic character behaviors: coding, reviewing, meetings, resting, sleeping
-- Day/night lighting system with work hours (08:00-21:00) and sleep window (21:00-08:00)
-- Coordinated multi-persona events: code reviews, syncs, bug fixes
+Real-time rendering of four personas at workstations, beds, rest areas. Dynamic character behaviors: coding, reviewing, meetings, resting, sleeping.
+
+**Persona Events — Walking (Pacing):**
+![Persona Walking Event](./docs/features/01-walking-event.png)
+
+**Persona Events — Drinking Coffee:**
+![Persona Coffee Event](./docs/features/02-coffee-event.png)
+
+**Persona Events — Working:**
+![Persona Working](./docs/features/04-working.png)
+
+### 🤝 Coordinated Multi-Persona Events
+Code reviews, syncs, bug fixes — multiple personas interact with each other in real time.
+
+**Multi-Persona Code Review in Progress:**
+![Multi-Persona Review Event](./docs/features/03-review-event.png)
 
 ### 📊 Multi-Persona Support
+
 | Persona | Profile ID | Description |
 |---------|-----------|-------------|
 | Default | `default` | Default gateway |
@@ -43,9 +55,9 @@ Pixel-style multi-persona AI assistant real-time monitoring dashboard. Supports 
                        │ HTTP / WebSocket
 ┌──────────────────────▼───────────────────────────────────┐
 │   monitor_server.py (FastAPI, Port 8899)                 │
-│   ├── /api/state          Real-time persona status      │
-│   ├── /api/metrics/daily  Today/cumulative metrics      │
-│   └── /api/metrics/ingest Hermes push metrics           │
+│   ├── /api/state          Real-time persona status       │
+│   ├── /api/metrics/daily  Today/cumulative metrics        │
+│   └── /api/metrics/ingest Hermes push metrics             │
 └──────────────────────┬───────────────────────────────────┘
                        │
           ┌────────────┴────────────┐
@@ -57,7 +69,7 @@ Pixel-style multi-persona AI assistant real-time monitoring dashboard. Supports 
    └─────────────┘        └─────────────────┘
 
 ┌──────────────────────────────────────────────────────────┐
-│   claude-proxy-server-80.py (Port 80)                   │
+│   claude-proxy-server-80.py (Port 80)                    │
 │   Claude Code CLI → Volcano Ark / Anthropic API          │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -136,6 +148,13 @@ hermes-monitor/
 │       └── pm.yaml
 ├── scripts/
 │   └── restore.sh                  # Data recovery script
+├── docs/
+│   ├── screenshot.png             # Main dashboard screenshot
+│   └── features/                  # Feature screenshots
+│       ├── 01-walking-event.png
+│       ├── 02-coffee-event.png
+│       ├── 03-review-event.png
+│       └── 04-working.png
 ├── .env.template
 ├── config.yaml.template
 └── README.md
