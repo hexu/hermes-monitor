@@ -1,166 +1,168 @@
 # Hermes Monitor
 
-像素风格多分身 AI 助手实时监控面板。支持四路分身（默认助手 / PM / 研发经理 / CC研发）状态追踪、行为可视化、Metrics 统计。
+Pixel-style multi-persona AI assistant real-time monitoring dashboard. Supports four personas (default / PM / Tech Lead / CC Dev) with status tracking, behavior visualization, and Metrics statistics.
 
-![Hermes Monitor Preview](https://img.shields.io/badge/Python-3.11+-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![Platform](https://img.shields.io/badge/Platform-Linux-orange)
+![Hermes Monitor Preview](./docs/screenshot.png)
+<!-- Replace with your own screenshot: /tmp/hermes_monitor_screenshot.png -->
 
-## 功能特性
+## Features
 
-- **像素画布可视化** — 实时渲染四个分身的工位、床位、行为动作
-- **四分身支持** — default / pm / tech / claude-code 独立 profile
-- **联合事件系统** — 多人协作场景：评审、对齐、调 Bug
-- **Metrics 双口径** — 今日数据 + 历史累计分别统计
-- **CC研发中转代理** — 端口 80 转发到火山方舟 Coding API
-- **跨天自动重置** — 北京时间 00:00 自动清零今日数据，保留历史
-- **响应式布局** — 支持 2880px 高分屏 / 1440px / 900px 多分辨率
+### 🖥️ Pixel Office Visualization
+- Real-time rendering of four personas at workstations, beds, rest areas
+- Dynamic character behaviors: coding, reviewing, meetings, resting, sleeping
+- Day/night lighting system with work hours (08:00-21:00) and sleep window (21:00-08:00)
+- Coordinated multi-persona events: code reviews, syncs, bug fixes
 
-## 系统架构
+### 📊 Multi-Persona Support
+| Persona | Profile ID | Description |
+|---------|-----------|-------------|
+| Default | `default` | Default gateway |
+| PM | `pm` | Product Manager persona |
+| Tech Lead | `tech` | R&D Manager persona |
+| CC Dev | `claude-code` | Claude Code CLI persona |
+
+### 📈 Metrics Dashboard
+- **Dual Counter System**: Today's data + historical cumulative separately
+- **Token Tracking**: Input/output/reasoning tokens per persona
+- **Activity Status**: Active minutes, last active time, online/offline/sleeping
+- **Auto Day Reset**: Beijing time 00:00 auto-resets today's data, preserves history
+
+### 🔄 CC Dev Reverse Proxy
+- Port 80 forwarding to Volcano Ark Coding API
+- Automatic metrics ingestion to monitor panel
+- Claude Code CLI compatible
+
+## System Architecture
 
 ```
-┌──────────────────────────────────────────────────────┐
-│                  浏览器 (8899)                        │
-│    pixel-office.js (像素画布)                        │
-│    server-panel.js (右侧指标面板)                    │
-└──────────────────────┬───────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    Browser (Port 8899)                    │
+│   pixel-office.js (Pixel Canvas)                         │
+│   server-panel.js (Right-side Metrics Panel)             │
+└──────────────────────┬───────────────────────────────────┘
                        │ HTTP / WebSocket
-┌──────────────────────▼───────────────────────────────┐
-│   monitor_server.py (FastAPI, 端口 8899)             │
-│   ├── /api/state          实时分身状态              │
-│   ├── /api/metrics/daily  今日/累计指标             │
-│   └── /api/metrics/ingest Hermes push 指标           │
-└──────────────────────┬───────────────────────────────┘
+┌──────────────────────▼───────────────────────────────────┐
+│   monitor_server.py (FastAPI, Port 8899)                 │
+│   ├── /api/state          Real-time persona status      │
+│   ├── /api/metrics/daily  Today/cumulative metrics      │
+│   └── /api/metrics/ingest Hermes push metrics           │
+└──────────────────────┬───────────────────────────────────┘
                        │
           ┌────────────┴────────────┐
           │                         │
    ┌──────▼──────┐        ┌────────▼────────┐
-   │ Hermes      │        │ hermes_        │
+   │ Hermes      │        │ hermes_         │
    │ Gateway     │        │ collector.py    │
-   │ (WS API)    │        │ (采集器)        │
+   │ (WS API)    │        │ (Collector)     │
    └─────────────┘        └─────────────────┘
 
-┌──────────────────────────────────────────────────────┐
-│   claude-proxy-server-80.py (端口 80)               │
-│   Claude Code CLI → 火山方舟 / Anthropic API         │
-└──────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│   claude-proxy-server-80.py (Port 80)                   │
+│   Claude Code CLI → Volcano Ark / Anthropic API          │
+└──────────────────────────────────────────────────────────┘
 ```
 
-## 快速开始
+## Quick Start
 
-### 前置要求
+### Prerequisites
 
 - Python 3.11+
-- Linux 服务器（测试于 CentOS/Alibaba Cloud Linux）
+- Linux server (tested on CentOS / Alibaba Cloud Linux)
 - `pip install fastapi uvicorn websockets aiohttp`
 
-### 1. 克隆项目
-
-```bash
-git clone https://github.com/pawn/hermes-monitor.git
-cd hermes-monitor
-```
-
-### 2. 安装依赖
+### 1. Install Dependencies
 
 ```bash
 pip install fastapi uvicorn websockets aiohttp
 ```
 
-### 3. 配置
+### 2. Configure
 
 ```bash
-# 复制并编辑环境变量模板
+# Copy environment template
 cp .env.template .env
-# 编辑 .env 填入你的 API Key
+# Edit .env with your API keys
 
-# 或直接设置环境变量
+# Or set environment variables directly
 export ALIBABA_CODING_PLAN_API_KEY=your_key_here
 export FEISHU_APP_ID=cli_xxx
 export FEISHU_APP_SECRET=your_secret
 ```
 
-### 4. 启动监控服务
+### 3. Start Services
 
 ```bash
 cd monitor
 
-# 启动后端服务（端口 8899）
+# Start backend service (Port 8899)
 python3 backend/monitor_server.py &
 
-# 启动 CC研发中转代理（端口 80，可选）
+# Start CC Dev reverse proxy (Port 80, optional)
 python3 claude-proxy-server-80.py &
 
-# 访问面板
+# Access dashboard
 # http://localhost:8899/
 ```
 
-### 5. 配置 Hermes 上报
+### 4. Configure Hermes Reporting
 
-在你运行 Hermes Agent 的服务器上，配置 metrics 上报到监控面板：
+On the server running Hermes Agent, configure metrics reporting:
 
 ```bash
 export ANTHROPIC_INGEST_URL=http://<monitor-ip>:8899/api/metrics/ingest
 ```
 
-## 分身说明
-
-| 分身 | Profile ID | 说明 |
-|------|-----------|------|
-| 默认助手 | `default` | 默认 gateway |
-| PM | `pm` | 产品经理分身 |
-| 研发经理 | `tech` | 研发经理分身 |
-| CC研发 | `claude-code` | Claude Code CLI 模拟分身 |
-
-## 目录结构
+## Directory Structure
 
 ```
 hermes-monitor/
 ├── monitor/
 │   ├── backend/
-│   │   ├── monitor_server.py      # 监控后端（FastAPI）
-│   │   └── hermes_collector.py    # Hermes 数据采集器
+│   │   ├── monitor_server.py      # Monitor backend (FastAPI)
+│   │   └── hermes_collector.py    # Hermes data collector
 │   ├── frontend/
-│   │   ├── index.html             # 面板入口
-│   │   ├── pixel-office.js        # 像素画布 + 行为逻辑
-│   │   ├── server-panel.js       # 右侧指标面板
+│   │   ├── index.html             # Dashboard entry
+│   │   ├── pixel-office.js        # Pixel canvas + behavior logic
+│   │   ├── server-panel.js        # Right-side metrics panel
 │   │   └── data/
-│   │       ├── seats.json         # 工位/床位坐标
-│   │       └── tilemap.json       # 地图瓦片数据
-│   ├── claude-proxy-server-80.py # CC研发中转代理
-│   ├── external_metrics.json      # 指标数据（可选提交）
-│   └── SPEC-*.md                  # 详细设计文档
+│   │       ├── seats.json         # Workstation/bed coordinates
+│   │       └── tilemap.json       # Map tile data
+│   ├── claude-proxy-server-80.py  # CC Dev reverse proxy
+│   ├── external_metrics.json      # Metrics data (optional)
+│   └── SPEC-*.md                  # Design documents
 ├── configs/
-│   └── profiles/                  # 各分身配置模板
+│   └── profiles/                   # Persona config templates
 │       ├── tech.yaml
 │       └── pm.yaml
 ├── scripts/
-│   └── restore.sh                  # 数据恢复脚本
+│   └── restore.sh                  # Data recovery script
 ├── .env.template
 ├── config.yaml.template
 └── README.md
 ```
 
-## CC研发 中转代理
+## CC Dev Reverse Proxy
 
-如果你使用 Claude Code CLI 作为研发分身，需要启动中转代理：
+When using Claude Code CLI as the dev persona, start the reverse proxy:
 
 ```bash
-# 在监控服务器上启动代理（端口 80）
+# On monitor server
 python3 monitor/claude-proxy-server-80.py &
 
-# 在 Claude Code 服务器上配置
+# On Claude Code server
 export ANTHROPIC_BASE_URL=http://<monitor-server-ip>:80
 export ANTHROPIC_API_KEY=sk-ant-xxxxx
 ```
 
-代理会：
-1. 接收 Claude Code CLI 请求
-2. 转发到配置的 `ANTHROPIC_UPSTREAM_URL`（默认火山方舟）
-3. 记录调用次数和 token 消耗
-4. 上报到 `ANTHROPIC_INGEST_URL`
+The proxy will:
+1. Receive Claude Code CLI requests
+2. Forward to configured `ANTHROPIC_UPSTREAM_URL` (default: Volcano Ark)
+3. Log call counts and token usage
+4. Report to `ANTHROPIC_INGEST_URL`
 
-## 部署方式
+## Deployment
 
-### Docker（推荐）
+### Docker (Recommended)
 
 ```yaml
 # docker-compose.yml
@@ -168,16 +170,12 @@ version: '3.8'
 services:
   hermes-monitor:
     image: python:3.11-slim
-    working_dir: /app
     command: bash -c "pip install fastapi uvicorn websockets aiohttp && python backend/monitor_server.py"
     ports:
       - "8899:8899"
       - "80:80"
     volumes:
       - ./monitor:/app/monitor
-      - ./configs:/app/configs
-    environment:
-      - ALIBABA_CODING_PLAN_API_KEY=${API_KEY}
     restart: unless-stopped
 ```
 
@@ -185,7 +183,7 @@ services:
 docker-compose up -d
 ```
 
-### Systemd 服务
+### Systemd Service
 
 ```ini
 # /etc/systemd/system/hermes-monitor.service
@@ -209,28 +207,28 @@ systemctl enable hermes-monitor
 systemctl start hermes-monitor
 ```
 
-## 常见问题
+## FAQ
 
-**Q: 面板数据全部为 0？**
-A: 检查 Hermes 是否配置了 `ANTHROPIC_INGEST_URL` 上报到监控面板，确认监控服务端口 8899 可达。
+**Q: All panel data shows 0?**
+A: Check if Hermes is configured with `ANTHROPIC_INGEST_URL` pointing to the monitor panel. Ensure port 8899 is reachable.
 
-**Q: CC研发代理无法连接？**
-A: 确认端口 80 未被占用，上游 `ANTHROPIC_UPSTREAM_URL` 可达。
+**Q: CC proxy connection failed?**
+A: Verify port 80 is not occupied. Check if upstream `ANTHROPIC_UPSTREAM_URL` is reachable.
 
-**Q: 如何添加新的分身？**
-A: 在 `pixel-office.js` 的 `COLORS` / `_profileOrder` / `_profileName` 中注册，并在 `seats.json` 中分配工位和床位坐标。
+**Q: How to add new personas?**
+A: Register in `pixel-office.js`: `COLORS` / `_profileOrder` / `_profileName`. Assign workstation and bed coordinates in `seats.json`.
 
-## 开发相关
+## Development
 
 ```bash
-# 查看所有 SPEC 文档
+# View all SPEC documents
 ls monitor/SPEC-*.md
 
-# SPEC 编号规则
+# SPEC numbering rules
 # v19 → v20 → v21 → v22
-# v21-M1 ~ v21-M5 为 v21 的子里程碑
+# v21-M1 ~ v21-M5 are v21 sub-milestones
 ```
 
 ## License
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+MIT License - see [LICENSE](LICENSE) file
