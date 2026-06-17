@@ -207,6 +207,9 @@ async def get_daily_metrics():
     now_ts = int(__import__("time").time())
     # 注入外部客户端指标（claude-code 等）
     for ext_profile in list(_external_metrics.keys()):
+        # 只追加 collect_daily_metrics() 中没有的外部分身（claude-code 等，不在 profiles 目录中）
+        if ext_profile in ('default', 'pm', 'tech'):
+            continue  # 已由 collect_daily_metrics() 提供（真实 gateway 状态）
         m = _ensure_fresh_metrics(ext_profile)
         last_ts = m.get("last_active")
         idle_sec = (now_ts - last_ts) if last_ts else 99999

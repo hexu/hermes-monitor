@@ -1109,7 +1109,7 @@ const PixelOffice = {
   // v20-M5：后端真实状态只派生 Work Gate；左侧表象由 Persona State 自主决定。
   _workModeFromData(p) {
     const s = this._statusOf(p);
-    if (s === 'working' || s === 'thinking') return 'work';
+    if (s === 'working' || s === 'thinking' || s === 'idle') return 'work';
     if (s === 'error') return 'error';
     return 'offwork';
   },
@@ -1121,10 +1121,10 @@ const PixelOffice = {
     const sleepWindow = this._isSleepWindow();
     if (status === 'working') return 'work_sit';
     if (status === 'thinking') return 'work_think';
-    if (status === 'sleeping') return sleepWindow ? 'sleep_bed' : 'lounge_idle';
-    if (status === 'idle') return 'lounge_idle';
+    if (status === 'sleeping') return sleepWindow ? 'sleep_bed' : 'work_think';
+    if (status === 'idle') return 'work_think';   // idle 也在工位（等活）
     if (status === 'error') return 'lounge_idle';
-    return 'lounge_idle';
+    return 'work_think';
   },
 
   _targetForProfile(p, profiles) {
