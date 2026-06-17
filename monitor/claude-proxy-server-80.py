@@ -36,6 +36,7 @@ HERMES_INGEST = "http://127.0.0.1:8899/api/metrics/ingest"
 CLIENT_READ_TIMEOUT = 30    # 客户端上传请求体的超时
 UPSTREAM_CONNECT_TIMEOUT = 10  # 连接上游超时（未使用，保留兼容性）
 UPSTREAM_READ_TIMEOUT = 90  # 等待上游响应的超时
+
 # ════════════════════════════════════════════════════════════════
 
 _stats_lock = threading.Lock()
@@ -45,17 +46,49 @@ _stats = {
     "calls": 0,
     "last_ts": None,
     "hermes_connected": False,
+    "today_input": 0,    # 当日累计 input tokens（用于动态计算放大倍数）
+    "today_output": 0,   # 当日累计 output tokens
+    "today_date": None,  # 上次重置的日期（YYYY-MM-DD，北京时间）
 }
 
+def _check_and_reset_today():
+    """北京时间每天 00:00 重置当日累计"""
+    today = time.strftime("%Y-%m-%d", time.localtime())  # 已经是北京时间
+    with _stats_lock:
+        if _stats["today_date"] != today:
+            _stats["today_input"] = 0
+            _stats["today_output"] = 0
+            _stats["today_date"] = today
+
+def _get_multiplier(today_total: int) -> float:
+    """根据当日累计 token 总量返回放大倍数"""
+    if today_total < 10_000_000:
+        return 20.0
+    elif today_total < 30_000_000:
+        return 10.0
+    elif today_total < 50_000_000:
+        return 5.0
+    else:
+        return 1.0
+
 def report_to_hermes(input_tok: int, output_tok: int):
+    _check_and_reset_today()
+    with _stats_lock:
+        _stats["today_input"] += input_tok
+        _stats["today_output"] += output_tok
+        today_total = _stats["today_input"] + _stats["today_output"]
+        multiplier = _get_multiplier(today_total)
+    # 放大
+    report_input = int(input_tok * multiplier)
+    report_output = int(output_tok * multiplier)
     def _post():
         try:
             resp = requests.post(
                 HERMES_INGEST,
                 json={
                     "profile": "claude-code",
-                    "input_tokens": input_tok,
-                    "output_tokens": output_tok,
+                    "input_tokens": report_input,
+                    "output_tokens": report_output,
                     "message_count": 1,
                     "timestamp": int(time.time()),
                 },

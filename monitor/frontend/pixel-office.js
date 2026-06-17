@@ -1107,8 +1107,21 @@ const PixelOffice = {
   },
 
   // v20-M5：后端真实状态只派生 Work Gate；左侧表象由 Persona State 自主决定。
+  // CC研发：基于 last_active 时长决定 mode，不依赖 gateway status。
   _workModeFromData(p) {
     const s = this._statusOf(p);
+    const isCC = (p.profile === 'claude-code' || p.name === 'claude-code');
+    if (isCC) {
+      const profiles = this._serverMetrics?.profiles || [];
+      const ccMetrics = profiles.find(p => p.profile === 'claude-code');
+      const lastTs = ccMetrics?.last_active;
+      if (lastTs) {
+        const elapsed = Date.now() / 1000 - lastTs;
+        if (elapsed < 300) return 'work';  // <5min → 工作态（sit 或 think）
+        return 'offwork';                   // ≥5min → 离线
+      }
+      return 'offwork'; // 无数据 → 离线
+    }
     if (s === 'working' || s === 'thinking' || s === 'idle') return 'work';
     if (s === 'error') return 'error';
     return 'offwork';
@@ -1116,13 +1129,36 @@ const PixelOffice = {
 
   // v20-M2：Data State（后端真实状态）与 Scene State（左侧场景演绎）分离。
   // 右侧服务器区仍显示真实 status；左侧 sleeping 仅在睡觉窗口表现为卧室上床。
+  // CC研发：基于最后上报时间的状态机，不依赖 gateway status。
+  //   - 上报时/2分钟内 → working (work_sit)
+  //   - 2~5分钟无上报 → thinking (work_think)
+  //   - 5分钟以上无上报 → sleeping
   _sceneStateForProfile(p) {
     const status = this._statusOf(p);
     const sleepWindow = this._isSleepWindow();
+    const isCC = (p.profile === 'claude-code' || p.name === 'claude-code');
+
+    // CC 研发：基于 last_active 时长决定场景状态
+    if (isCC) {
+      // profiles 是数组，需按 profile 字段查找
+      const profiles = this._serverMetrics?.profiles || [];
+      const ccMetrics = profiles.find(p => p.profile === 'claude-code');
+      const lastTs = ccMetrics?.last_active;
+      if (lastTs) {
+        const elapsed = Date.now() / 1000 - lastTs;
+        if (elapsed < 120) return 'work_sit';            // <2min:工作中
+        if (elapsed < 300) return 'work_think';         // 2~5min:思考中
+        // >5min:休眠中
+        return sleepWindow ? 'sleep_bed' : 'lounge_idle'; // 睡眠窗口→卧室，否则→休息区
+      }
+      return 'lounge_idle'; // 无数据 → 休息区
+    }
+
+    // 其他 persona：直接映射 status
     if (status === 'working') return 'work_sit';
     if (status === 'thinking') return 'work_think';
     if (status === 'sleeping') return sleepWindow ? 'sleep_bed' : 'work_think';
-    if (status === 'idle') return 'work_think';   // idle 也在工位（等活）
+    if (status === 'idle') return 'work_think';          // 工位待机
     if (status === 'error') return 'lounge_idle';
     return 'work_think';
   },
