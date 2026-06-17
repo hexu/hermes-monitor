@@ -1,0 +1,64 @@
+# Credentials & Secrets
+.env
+.env.*
+auth.json
+*.lock
+
+# Databases
+*.db
+*.db-shm
+*.db-wal
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Node
+node_modules/
+.npm
+.yarn
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Hermes runtime
+*.pid
+*.lock
+gateway_state.json
+feishu_seen_message_ids.json
+pairing/_rate_limits.json
+models_dev_cache.json
+response_store.db
+.sandboxes/
+home/
+pairing/feishu-approved.json
+pairing/feishu-pending.json
+cron/jobs.json
+processes.json
+.skill*
+
+# Monitor runtime
+monitor/external_metrics.json
+
+# Archive backups
+monitor/archive/
+sessions/

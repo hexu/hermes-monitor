@@ -1,0 +1,41 @@
+{
+  "version": "v19-m1",
+  "tileSize": 32,
+  "width": 30,
+  "height": 20,
+  "legend": {
+    "0": "void",
+    "1": "floor_bedroom",
+    "2": "floor_lounge",
+    "3": "floor_workspace",
+    "4": "floor_corridor",
+    "5": "wall",
+    "6": "door",
+    "7": "wall_window"
+  },
+  "rooms": {
+    "bedroom":   { "x": 1,  "y": 1,  "w": 8,  "h": 12, "floor": 1 },
+    "lounge":    { "x": 11, "y": 1,  "w": 8,  "h": 12, "floor": 2 },
+    "workspace": { "x": 21, "y": 1,  "w": 8,  "h": 12, "floor": 3 },
+    "corridor":  { "x": 0,  "y": 14, "w": 30, "h": 4,  "floor": 4 }
+  },
+  "doors": [
+    { "x": 4,  "y": 13, "facing": "south", "room": "bedroom" },
+    { "x": 14, "y": 13, "facing": "south", "room": "lounge" },
+    { "x": 24, "y": 13, "facing": "south", "room": "workspace" }
+  ],
+  "windows": [
+    { "x1": 1, "y1": 0, "x2": 8, "y2": 0, "wall": "north_bedroom" },
+    { "x1": 11, "y1": 0, "x2": 18, "y2": 0, "wall": "north_lounge" },
+    { "x1": 21, "y1": 0, "x2": 28, "y2": 0, "wall": "north_workspace" }
+  ],
+  "fadeoutZone": { "x": 28, "y": 14, "w": 2, "h": 4, "label": "厕所方向（淡出区）" },
+  "comments": [
+    "地图整体 30x20 tiles = 960x640 px",
+    "三个房间在上方各占 8x12，房间之间各空 2 tile 作为缓冲（实际是墙）",
+    "房间下方 y=13 是房间底墙，y=14-17 是横向主走廊（4 tile 高）",
+    "y=18-19 留给走廊下方装饰带（绿植/告示牌），不可走",
+    "y=0 是房间顶墙，含窗户",
+    "坐位坐标见 seats.json，墙壁位置由各房间 x/y/w/h 推断"
+  ]
+}

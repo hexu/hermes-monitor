@@ -1,0 +1,537 @@
+{
+  "version": "v21-m4",
+  "persona": {
+    "scheduler": {
+      "initial": {
+        "work": [
+          240,
+          1080
+        ],
+        "offwork_day": [
+          360,
+          1350
+        ],
+        "offwork_night": [
+          600,
+          1800
+        ]
+      },
+      "next": {
+        "work": [
+          1500,
+          3000
+        ],
+        "offwork_day": [
+          1300,
+          3000
+        ],
+        "offwork_night": [
+          2200,
+          4200
+        ]
+      },
+      "actor_jitter_mod": 300
+    },
+    "cooldowns": {
+      "finish": {
+        "work": 2100,
+        "offwork": 1800,
+        "phone": 4800,
+        "restroom": 6000,
+        "sleep_bed": 3600,
+        "sofa_nap": 3600
+      },
+      "global": {
+        "phone": 3600,
+        "restroom": 4800
+      }
+    },
+    "pools": {
+      "work": [
+        {
+          "type": "coding",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 420,
+          "facing": "hard",
+          "weights": {
+            "pm": 18,
+            "tech": 34,
+            "default": 36
+          }
+        },
+        {
+          "type": "thinking_plan",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 420,
+          "facing": "hard",
+          "weights": {
+            "pm": 18,
+            "tech": 34,
+            "default": 36
+          },
+          "when": {
+            "hardKind": "thinking"
+          }
+        },
+        {
+          "type": "whiteboard",
+          "target": {
+            "x": 24,
+            "y": 4
+          },
+          "hold": 220,
+          "holdByProfile": {
+            "pm": 300
+          },
+          "facing": "north",
+          "weights": {
+            "pm": 28,
+            "tech": 14,
+            "default": 10
+          }
+        },
+        {
+          "type": "coffee",
+          "target": {
+            "ref": "loungeProp",
+            "name": "coffee_machine",
+            "dx": 0,
+            "dy": 1
+          },
+          "hold": 150,
+          "facing": "north",
+          "weights": {
+            "tech": 18,
+            "default": 13,
+            "pm": 13
+          }
+        },
+        {
+          "type": "water",
+          "target": {
+            "ref": "loungeProp",
+            "name": "water_dispenser",
+            "dx": 0,
+            "dy": 1
+          },
+          "hold": 150,
+          "facing": "north",
+          "weights": {
+            "tech": 16,
+            "default": 11,
+            "pm": 11
+          }
+        },
+        {
+          "type": "stretch",
+          "target": {
+            "x": "hard.x",
+            "yExpr": "hard.y+2",
+            "yMax": 15
+          },
+          "hold": 110,
+          "facing": "hard",
+          "weight": 12
+        },
+        {
+          "type": "window",
+          "target": {
+            "xByProfile": {
+              "pm": 14,
+              "default": 22,
+              "tech": 22
+            },
+            "y": 2
+          },
+          "hold": 180,
+          "facing": "north",
+          "weights": {
+            "pm": 16,
+            "default": 8,
+            "tech": 8
+          }
+        },
+        {
+          "type": "restroom",
+          "phase": "exit",
+          "hiddenHold": 780,
+          "weight": 5
+        },
+        {
+          "type": "overtime-walk",
+          "target": {
+            "xExpr": "hard.x-2",
+            "xMin": 20,
+            "y": "hard.y"
+          },
+          "hold": 100,
+          "facing": "west",
+          "weight": 24,
+          "when": {
+            "night": true,
+            "profile": "tech"
+          }
+        },
+        {
+          "type": "micro_nap",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 120,
+          "facing": "hard",
+          "weight": 4
+        }
+      ],
+      "offwork": [
+        {
+          "type": "sleep_bed",
+          "target": {
+            "ref": "bed"
+          },
+          "hold": 900,
+          "facing": "south",
+          "weight": 34,
+          "when": {
+            "night": true
+          }
+        },
+        {
+          "type": "sofa_idle",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 300,
+          "facing": "hard",
+          "weight": 24,
+          "nightWeight": 12
+        },
+        {
+          "type": "search_idle",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 360,
+          "facing": "hard",
+          "weights": {
+            "default": 26,
+            "pm": 6,
+            "tech": 6
+          }
+        },
+        {
+          "type": "read_doc",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 360,
+          "facing": "hard",
+          "weights": {
+            "pm": 26,
+            "default": 10,
+            "tech": 10
+          }
+        },
+        {
+          "type": "window",
+          "target": {
+            "xByProfile": {
+              "pm": 14,
+              "default": 16,
+              "tech": 16
+            },
+            "y": 2
+          },
+          "hold": 220,
+          "facing": "north",
+          "weights": {
+            "pm": 20,
+            "default": 12,
+            "tech": 12
+          },
+          "boundary": "lounge_window"
+        },
+        {
+          "type": "coffee",
+          "target": {
+            "ref": "loungeProp",
+            "name": "coffee_machine",
+            "dx": 0,
+            "dy": 1
+          },
+          "hold": 160,
+          "facing": "north",
+          "weights": {
+            "tech": 18,
+            "default": 15,
+            "pm": 15
+          }
+        },
+        {
+          "type": "water",
+          "target": {
+            "ref": "loungeProp",
+            "name": "water_dispenser",
+            "dx": 0,
+            "dy": 1
+          },
+          "hold": 150,
+          "facing": "north",
+          "weight": 14
+        },
+        {
+          "type": "corridor_pace",
+          "target": {
+            "xExpr": "10+hash%9",
+            "yExpr": "10+hash%3"
+          },
+          "hold": 90,
+          "facing": "east",
+          "waypoints": [
+            {
+              "x": 10,
+              "y": 11
+            },
+            {
+              "x": 18,
+              "y": 11
+            },
+            {
+              "x": 12,
+              "y": 12
+            },
+            {
+              "x": 20,
+              "y": 12
+            }
+          ],
+          "weight": 18
+        },
+        {
+          "type": "phone",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 190,
+          "facing": "hard",
+          "weight": 5
+        },
+        {
+          "type": "restroom",
+          "phase": "exit",
+          "hiddenHold": 780,
+          "weight": 5
+        },
+        {
+          "type": "sofa_nap",
+          "target": {
+            "ref": "hard"
+          },
+          "hold": 520,
+          "facing": "hard",
+          "weight": 6,
+          "nightWeight": 18
+        }
+      ]
+    }
+  },
+  "sceneEvents": {
+    "scheduler": {
+      "initial": [
+        600,
+        1500
+      ],
+      "next": [
+        2400,
+        5200
+      ],
+      "cooldown": 7200,
+      "timeout": 2200,
+      "interactHold": [
+        360,
+        760
+      ]
+    },
+    "events": [
+      {
+        "type": "review_pair",
+        "participants": {
+          "names": [
+            "pm",
+            "tech"
+          ]
+        },
+        "weight": 18
+      },
+      {
+        "type": "debug_pair",
+        "participants": {
+          "names": [
+            "tech",
+            "default"
+          ]
+        },
+        "weight": 14
+      },
+      {
+        "type": "sync_pair",
+        "participants": {
+          "names": [
+            "pm",
+            "default"
+          ],
+          "fallbackNames": [
+            "pm",
+            "tech"
+          ]
+        },
+        "weight": 16
+      },
+      {
+        "type": "whiteboard_pair",
+        "participants": {
+          "from": "work",
+          "count": 2
+        },
+        "weight": 12,
+        "when": {
+          "workCountAtLeast": 2
+        }
+      },
+      {
+        "type": "chat_pair",
+        "participants": {
+          "from": "all",
+          "count": 2
+        },
+        "weight": 10,
+        "when": {
+          "notSleepWindow": true,
+          "allCountAtLeast": 2
+        }
+      }
+    ],
+    "layouts": {
+      "chat_pair": {
+        "center": {
+          "x": 14.5,
+          "y": 6.5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "聊两句",
+          "嗯嗯"
+        ]
+      },
+      "sync_pair": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "同步一下",
+          "收到"
+        ]
+      },
+      "whiteboard_pair": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "画一下",
+          "我看看"
+        ]
+      },
+      "review_pair": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "评审",
+          "技术点"
+        ]
+      },
+      "debug_pair": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "看日志",
+          "定位中"
+        ]
+      }
+    }
+  },
+  "thoughts": {
+    "pm": {
+      "whiteboard": "排期",
+      "window": "PRD",
+      "thinking_plan": "PRD"
+    },
+    "tech": {
+      "whiteboard": "架构",
+      "window": "debug",
+      "thinking_plan": "debug"
+    },
+    "default": {
+      "whiteboard": "检索中",
+      "window": "...",
+      "thinking_plan": "..."
+    }
+  }
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Outer ring -->
+  <circle cx="16" cy="16" r="14" fill="none" stroke="#e8d44d" stroke-width="2"/>
+  <!-- Inner H shape -->
+  <rect x="8" y="9" width="3" height="14" fill="#e8d44d"/>
+  <rect x="21" y="9" width="3" height="14" fill="#e8d44d"/>
+  <rect x="8" y="14" width="16" height="3" fill="#e8d44d"/>
+  <!-- Center dot -->
+  <circle cx="16" cy="15.5" r="2" fill="#05050a"/>
+</svg>

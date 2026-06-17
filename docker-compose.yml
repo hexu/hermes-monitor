@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  hermes-monitor:
+    image: python:3.11-slim
+    container_name: hermes-monitor
+    working_dir: /app
+    command: >
+      bash -c "
+        pip install --no-cache-dir fastapi uvicorn[standard] websockets aiohttp &&
+        python backend/monitor_server.py
+      "
+    ports:
+      - "8899:8899"
+    volumes:
+      - ./monitor:/app/monitor:ro
+      - ./configs:/app/configs:ro
+      - ./data:/app/data
+    environment:
+      - ALIBABA_CODING_PLAN_API_KEY=${ALIBABA_CODING_PLAN_API_KEY:-}
+      - FEISHU_APP_ID=${FEISHU_APP_ID:-}
+      - FEISHU_APP_SECRET=${FEISHU_APP_SECRET:-}
+      - ANTHROPIC_INGEST_URL=${ANTHROPIC_INGEST_URL:-}
+      - ANTHROPIC_UPSTREAM_URL=${ANTHROPIC_UPSTREAM_URL:-https://ark.cn-beijing.volces.com/api/coding}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8899/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # CC研发中转代理（可选，需要时取消注释）
+  # claude-proxy:
+  #   image: python:3.11-slim
+  #   container_name: claude-proxy
+  #   working_dir: /app
+  #   command: >
+  #     bash -c "
+  #       pip install --no-cache-dir fastapi uvicorn websockets aiohttp &&
+  #       python claude-proxy-server-80.py
+  #     "
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./monitor/claude-proxy-server-80.py:/app/claude-proxy-server-80.py:ro
+  #   environment:
+  #     - ANTHROPIC_UPSTREAM_URL=${ANTHROPIC_UPSTREAM_URL:-https://ark.cn-beijing.volces.com/api/coding}
+  #     - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+  #     - ANTHROPIC_INGEST_URL=${ANTHROPIC_INGEST_URL:-}
+  #   restart: unless-stopped

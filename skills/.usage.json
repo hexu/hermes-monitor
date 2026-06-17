@@ -1,0 +1,41 @@
+{
+  "daily-news-briefing": {
+    "archived_at": null,
+    "created_at": "2026-06-10T02:19:37.955829+00:00",
+    "created_by": null,
+    "last_patched_at": "2026-06-13T03:37:28.068393+00:00",
+    "last_used_at": "2026-06-13T03:37:18.804864+00:00",
+    "last_viewed_at": "2026-06-13T03:37:18.802373+00:00",
+    "patch_count": 15,
+    "pinned": false,
+    "state": "active",
+    "use_count": 17,
+    "view_count": 16
+  },
+  "news-briefing": {
+    "archived_at": null,
+    "created_at": "2026-06-12T02:39:04.876009+00:00",
+    "created_by": "agent",
+    "last_patched_at": "2026-06-13T02:54:59.999673+00:00",
+    "last_used_at": "2026-06-13T02:53:04.407039+00:00",
+    "last_viewed_at": "2026-06-13T02:53:04.404556+00:00",
+    "patch_count": 10,
+    "pinned": false,
+    "state": "active",
+    "use_count": 8,
+    "view_count": 8
+  },
+  "weekly-report-email": {
+    "archived_at": null,
+    "created_at": "2026-06-12T02:16:19.118411+00:00",
+    "created_by": null,
+    "last_patched_at": "2026-06-12T02:39:24.690916+00:00",
+    "last_used_at": "2026-06-12T02:34:25.259218+00:00",
+    "last_viewed_at": "2026-06-12T02:34:25.256784+00:00",
+    "patch_count": 4,
+    "pinned": false,
+    "state": "active",
+    "use_count": 3,
+    "view_count": 3
+  }
+}

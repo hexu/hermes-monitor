@@ -1,0 +1,59 @@
+{
+  "version": "v19-m1",
+  "tileSize": 32,
+  "comment": "坐位坐标采用 tile 坐标（x, y），一个角色占据一个 tile",
+
+  "workstations": [
+    { "id": "ws1", "x": 22, "y": 3,  "facing": "south", "deskTiles": [[22,2]], "lampTile": [21,2] },
+    { "id": "ws2", "x": 25, "y": 3,  "facing": "south", "deskTiles": [[25,2]], "lampTile": [24,2] },
+    { "id": "ws3", "x": 22, "y": 7,  "facing": "south", "deskTiles": [[22,6]], "lampTile": [21,6] },
+    { "id": "ws4", "x": 25, "y": 7,  "facing": "south", "deskTiles": [[25,6]], "lampTile": [24,6] },
+    { "id": "ws5", "x": 23, "y": 11, "facing": "south", "deskTiles": [[23,10],[24,10]], "lampTile": [22,10] }
+  ],
+
+  "beds": [
+    { "id": "bed1", "x": 2, "y": 3,  "facing": "south", "tiles": [[2,2],[2,3],[2,4]],   "lampTile": [3,2] },
+    { "id": "bed2", "x": 5, "y": 3,  "facing": "south", "tiles": [[5,2],[5,3],[5,4]],   "lampTile": [6,2] },
+    { "id": "bed3", "x": 2, "y": 7,  "facing": "south", "tiles": [[2,6],[2,7],[2,8]],   "lampTile": [3,6] },
+    { "id": "bed4", "x": 5, "y": 7,  "facing": "south", "tiles": [[5,6],[5,7],[5,8]],   "lampTile": [6,6] },
+    { "id": "bed5", "x": 3, "y": 11, "facing": "south", "tiles": [[3,10],[4,10],[5,10]],"lampTile": [2,10] }
+  ],
+
+  "loungeSeats": [
+    { "id": "sofa3_1", "x": 12, "y": 5, "facing": "south", "type": "couch_3p_seat1" },
+    { "id": "sofa3_2", "x": 13, "y": 5, "facing": "south", "type": "couch_3p_seat2" },
+    { "id": "sofa3_3", "x": 14, "y": 5, "facing": "south", "type": "couch_3p_seat3" },
+    { "id": "sofa1_1", "x": 17, "y": 4, "facing": "west",  "type": "single_sofa_1" },
+    { "id": "sofa1_2", "x": 17, "y": 8, "facing": "west",  "type": "single_sofa_2" }
+  ],
+
+  "loungeProps": {
+    "coffee_table": { "x1": 12, "y1": 7, "x2": 14, "y2": 7 },
+    "coffee_machine": { "x": 18, "y": 11, "facing": "south" },
+    "water_dispenser": { "x": 12, "y": 11, "facing": "south" },
+    "treadmill": { "x1": 15, "y1": 10, "x2": 16, "y2": 12 },
+    "plant1": { "x": 11, "y": 1 },
+    "plant2": { "x": 18, "y": 1 }
+  },
+
+  "workspaceProps": {
+    "whiteboard": { "x1": 27, "y1": 1, "x2": 28, "y2": 4 },
+    "printer": { "x1": 27, "y1": 8, "x2": 28, "y2": 9 },
+    "filing_cabinet": { "x1": 27, "y1": 11, "x2": 28, "y2": 12 },
+    "plant1": { "x": 21, "y": 12 }
+  },
+
+  "bedroomProps": {
+    "alarm_clock": { "x": 8, "y": 1 },
+    "wardrobe": { "x1": 7, "y1": 9, "x2": 8, "y2": 12 },
+    "rug": { "x1": 3, "y1": 5, "x2": 4, "y2": 6 }
+  },
+
+  "windowOuts": [
+    { "x": 4, "y": 0, "type": "bedroom" },
+    { "x": 14, "y": 0, "type": "lounge" },
+    { "x": 24, "y": 0, "type": "workspace" }
+  ],
+
+  "fadeoutPoint": { "x": 29, "y": 16, "label": "厕所方向走廊尽头淡出点" }
+}
