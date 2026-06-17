@@ -4,7 +4,7 @@ model:
   base_url: https://ark.cn-beijing.volces.com/api/coding/v3  # or your custom endpoint
   api_key: {{VOLCES_API_KEY}}
   #base_url: https://api.iamhc.cn/v1
-  #api_key: sk-iMWkoTZlSJTYkp5i9Pg8nhZLfeQCmQ4iGlaWrG7v85TCaawk
+  #api_key: YOUR_API_KEY
   default: MiniMax-M2.7
 providers: {}
 fallback_providers: []
@@ -390,7 +390,7 @@ platform_toolsets:
 custom_providers:
 - name: Dashscope.aliyuncs.com
   base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
-  api_key: sk-f946d19f2ec14b2cbe0659d41095d553
+  api_key: YOUR_API_KEY
   model: qwen-vl-max
 FEISHU_HOME_CHANNEL: oc_YOUR_HOME_CHANNEL
 backend: local

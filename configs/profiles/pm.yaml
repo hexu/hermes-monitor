@@ -387,7 +387,7 @@ platform_toolsets:
 custom_providers:
 - name: Dashscope.aliyuncs.com
   base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
-  api_key: sk-f946d19f2ec14b2cbe0659d41095d553
+  api_key: YOUR_API_KEY
   model: qwen-vl-max
 - name: huoshan-coding-plan
   base_url: https://ark.cn-beijing.volces.com/api/coding/v3
