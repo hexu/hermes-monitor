@@ -174,17 +174,28 @@ async def get_state():
         last_ts = ext.get("last_active")
         now_ts = int(__import__("time").time())
         idle_sec = (now_ts - last_ts) if last_ts else 99999
-        # idle < 5min → working, 5-30min → idle, > 30min → sleeping
-        if idle_sec < 300:
+        # ── V22 统一状态推导（与前端 pixel-office.js 保持一致）──
+        # last_active < 1min → working; 1~5min → thinking;
+        # ≥5min + 白天 → idle（lounge_idle）; ≥5min + 睡眠窗口 → sleeping（bed）。
+        from datetime import datetime
+        hour = datetime.now().hour
+        is_sleep_window = hour >= 21 or hour < 8
+        if idle_sec < 60:
             cc_status = "working"
-        elif idle_sec < 1800:
-            cc_status = "idle"
-        else:
+            cc_location = "laptop"
+        elif idle_sec < 300:
+            cc_status = "thinking"
+            cc_location = "laptop"
+        elif is_sleep_window:
             cc_status = "sleeping"
+            cc_location = "bed"
+        else:
+            cc_status = "idle"
+            cc_location = "lounge_idle"
         state["profiles"].append({
             "profile": "claude-code",
             "status": cc_status,
-            "location": "laptop",
+            "location": cc_location,
             "message_count": ext.get("total_message_count", 0),
             "tool_call_count": ext.get("total_message_count", 0),  # CC: 调用=消息
             "total_tokens": ext.get("total_tokens", 0),
@@ -213,12 +224,21 @@ async def get_daily_metrics():
         m = _ensure_fresh_metrics(ext_profile)
         last_ts = m.get("last_active")
         idle_sec = (now_ts - last_ts) if last_ts else 99999
-        if idle_sec < 300:
+        from datetime import datetime as dt
+        hour = dt.now().hour
+        is_sleep_window = hour >= 21 or hour < 8
+        if idle_sec < 60:
             status = "working"
-        elif idle_sec < 1800:
-            status = "idle"
-        else:
+            location = "laptop"
+        elif idle_sec < 300:
+            status = "thinking"
+            location = "laptop"
+        elif is_sleep_window:
             status = "sleeping"
+            location = "bed"
+        else:
+            status = "idle"
+            location = "lounge_idle"
         # active_minutes: 基于 idle 时长估算（idle 越长说明越久没活动，活跃分钟取一个合理上限）
         # 思路：假设 claude-code 每次活跃持续 ~5min，idle 5min 内 → 活跃 5min；idle 每增加 1h，额外增加 10min
         if last_ts and idle_sec < 300:
@@ -250,7 +270,7 @@ async def get_daily_metrics():
             "tool_call_count":      m["total_message_count"],  # CC: 调用=消息
             "last_active":          last_ts,
             "status":               status,
-            "location":             "laptop",
+            "location":             location,
         })
     return JSONResponse(result)
 
@@ -275,12 +295,43 @@ async def websocket(ws: WebSocket):
 
 
 def _inject_external_profiles(state: dict):
-    """把外部客户端（laptop）profile 注入到 metrics，但不注入到场景 profiles。
-
-    PixelOffice 只处理 profiles[] 里的分身，无坐标的分身会乱放。
-    因此 laptop 不进 profiles，只在右面板 metrics 里展示。
+    """把外部客户端（claude-code）profile 注入到 state["profiles"]，
+    让 PixelOffice 前端能为 CC Dev 创建 actor 并参与场景事件。
     """
-    pass  # 不再注入 — laptop 的 state 在 server-panel.js 的 _tokenHistory 中独立管理
+    if "claude-code" not in _external_metrics:
+        return
+    ext = _ensure_fresh_metrics("claude-code")
+    last_ts = ext.get("last_active")
+    now_ts = int(__import__("time").time())
+    idle_sec = (now_ts - last_ts) if last_ts else 99999
+    from datetime import datetime as dt
+    hour = dt.now().hour
+    is_sleep_window = hour >= 21 or hour < 8
+    if idle_sec < 60:
+        cc_status, cc_location = "working", "laptop"
+    elif idle_sec < 300:
+        cc_status, cc_location = "thinking", "laptop"
+    elif is_sleep_window:
+        cc_status, cc_location = "sleeping", "bed"
+    else:
+        cc_status, cc_location = "idle", "lounge_idle"
+    state["profiles"].append({
+        "profile": "claude-code",
+        "status": cc_status,
+        "location": cc_location,
+        "message_count": ext.get("total_message_count", 0),
+        "tool_call_count": ext.get("total_message_count", 0),
+        "total_tokens": ext.get("total_tokens", 0),
+        "input_tokens": ext.get("total_input_tokens", 0),
+        "output_tokens": ext.get("total_output_tokens", 0),
+        "today_tokens": ext.get("today_tokens", 0),
+        "last_active": last_ts or "N/A",
+        "current_tool": None,
+        "_raw_model": True,
+        "_is_claude_code": True,
+        "_idle_seconds": idle_sec,
+        "metadata": {"model": "MiniMax-M3"},
+    })
 
 
 if __name__ == "__main__":

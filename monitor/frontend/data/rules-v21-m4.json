@@ -412,6 +412,66 @@
           "notSleepWindow": true,
           "allCountAtLeast": 2
         }
+      },
+      {
+        "type": "cc_review",
+        "participants": {
+          "names": [
+            "claude-code",
+            "tech"
+          ]
+        },
+        "weight": 17
+      },
+      {
+        "type": "cc_sync",
+        "participants": {
+          "names": [
+            "claude-code",
+            "pm"
+          ]
+        },
+        "weight": 15
+      },
+      {
+        "type": "cc_debug",
+        "participants": {
+          "names": [
+            "claude-code",
+            "default"
+          ]
+        },
+        "weight": 13
+      },
+      {
+        "type": "tech_cc_review",
+        "participants": {
+          "names": [
+            "tech",
+            "claude-code"
+          ]
+        },
+        "weight": 12
+      },
+      {
+        "type": "pm_cc_sync",
+        "participants": {
+          "names": [
+            "pm",
+            "claude-code"
+          ]
+        },
+        "weight": 11
+      },
+      {
+        "type": "tech_cc_debug",
+        "participants": {
+          "names": [
+            "tech",
+            "claude-code"
+          ]
+        },
+        "weight": 10
       }
     ],
     "layouts": {
@@ -513,6 +573,126 @@
         "phrases": [
           "看日志",
           "定位中"
+        ]
+      },
+      "cc_review": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "评审一下",
+          "技术方案"
+        ]
+      },
+      "cc_sync": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "同步一下",
+          "CC对齐"
+        ]
+      },
+      "cc_debug": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "来看下",
+          "调一下"
+        ]
+      },
+      "tech_cc_review": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "请CC评审",
+          "技术方案"
+        ]
+      },
+      "pm_cc_sync": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "CC来同步",
+          "马上到"
+        ]
+      },
+      "tech_cc_debug": {
+        "center": {
+          "x": 24,
+          "y": 5
+        },
+        "offsets": [
+          [
+            -0.8,
+            1
+          ],
+          [
+            0.8,
+            1
+          ]
+        ],
+        "phrases": [
+          "CC来看看",
+          "一起调"
         ]
       }
     }

@@ -1101,66 +1101,44 @@ const PixelOffice = {
     return this._profileOrder().length + Math.max(0, dynamic.indexOf(name));
   },
 
+  // V22：后端已统一推导 status/location，前端直接使用 API 值，不再重复推导。
   _statusOf(p) {
-    const s = p?.status || 'idle';
-    return ['working', 'thinking', 'sleeping', 'idle', 'error'].includes(s) ? s : 'idle';
+    return p?.status || 'idle';
   },
 
-  // v20-M5：后端真实状态只派生 Work Gate；左侧表象由 Persona State 自主决定。
-  // CC研发：基于 last_active 时长决定 mode，不依赖 gateway status。
+  _lastActiveOf(p) {
+    // 仅供 display/inspector 使用，行为推导不再依赖
+    if (!p) return null;
+    if (p.profile === 'claude-code' || p.name === 'claude-code') {
+      const list = this._serverMetrics?.profiles || [];
+      const cc = list.find(m => m.profile === 'claude-code');
+      return cc?.last_active ?? null;
+    }
+    let ts = p.last_active ?? null;
+    if (ts == null) return null;
+    if (typeof ts === 'string') return new Date(ts).getTime() / 1000;
+    if (typeof ts === 'number' && ts > 1e12) return ts / 1000;
+    return ts;
+  },
+
+  // ── V22：直接使用后端提供的 status + location ──
   _workModeFromData(p) {
     const s = this._statusOf(p);
-    const isCC = (p.profile === 'claude-code' || p.name === 'claude-code');
-    if (isCC) {
-      const profiles = this._serverMetrics?.profiles || [];
-      const ccMetrics = profiles.find(p => p.profile === 'claude-code');
-      const lastTs = ccMetrics?.last_active;
-      if (lastTs) {
-        const elapsed = Date.now() / 1000 - lastTs;
-        if (elapsed < 300) return 'work';  // <5min → 工作态（sit 或 think）
-        return 'offwork';                   // ≥5min → 离线
-      }
-      return 'offwork'; // 无数据 → 离线
-    }
-    if (s === 'working' || s === 'thinking' || s === 'idle') return 'work';
+    if (s === 'working' || s === 'thinking') return 'work';
+    if (s === 'idle' || s === 'sleeping') return 'offwork';
     if (s === 'error') return 'error';
     return 'offwork';
   },
 
-  // v20-M2：Data State（后端真实状态）与 Scene State（左侧场景演绎）分离。
-  // 右侧服务器区仍显示真实 status；左侧 sleeping 仅在睡觉窗口表现为卧室上床。
-  // CC研发：基于最后上报时间的状态机，不依赖 gateway status。
-  //   - 上报时/2分钟内 → working (work_sit)
-  //   - 2~5分钟无上报 → thinking (work_think)
-  //   - 5分钟以上无上报 → sleeping
   _sceneStateForProfile(p) {
-    const status = this._statusOf(p);
-    const sleepWindow = this._isSleepWindow();
-    const isCC = (p.profile === 'claude-code' || p.name === 'claude-code');
-
-    // CC 研发：基于 last_active 时长决定场景状态
-    if (isCC) {
-      // profiles 是数组，需按 profile 字段查找
-      const profiles = this._serverMetrics?.profiles || [];
-      const ccMetrics = profiles.find(p => p.profile === 'claude-code');
-      const lastTs = ccMetrics?.last_active;
-      if (lastTs) {
-        const elapsed = Date.now() / 1000 - lastTs;
-        if (elapsed < 120) return 'work_sit';            // <2min:工作中
-        if (elapsed < 300) return 'work_think';         // 2~5min:思考中
-        // >5min:休眠中
-        return sleepWindow ? 'sleep_bed' : 'lounge_idle'; // 睡眠窗口→卧室，否则→休息区
-      }
-      return 'lounge_idle'; // 无数据 → 休息区
-    }
-
-    // 其他 persona：直接映射 status
-    if (status === 'working') return 'work_sit';
-    if (status === 'thinking') return 'work_think';
-    if (status === 'sleeping') return sleepWindow ? 'sleep_bed' : 'work_think';
-    if (status === 'idle') return 'work_think';          // 工位待机
-    if (status === 'error') return 'lounge_idle';
-    return 'work_think';
+    // 后端已返回 location，直接映射为场景状态
+    const loc = p?.location || '';
+    if (loc === 'workstation' || loc === 'work_sit') return 'work_sit';
+    if (loc === 'work_think' || loc === 'thinking') return 'work_think';
+    if (loc === 'lounge_idle' || loc === 'lounge') return 'lounge_idle';
+    if (loc === 'bed' || loc === 'sleep_bed') return 'sleep_bed';
+    if (loc === 'laptop') return 'lounge_idle';  // CC Dev idle → 休息区
+    return 'lounge_idle';
   },
 
   _targetForProfile(p, profiles) {
@@ -1423,10 +1401,13 @@ const PixelOffice = {
       if (preferWork && mode !== 'work') return false;
       const b = a.persona || a.behavior;
       if (b && b.type === 'restroom') return false;
-      // V21-M5 热修：睡觉窗口内，status=sleeping 的人不参与多人事件，除非被叫醒（work/thinking）。
       const s = this._statusOf(p);
-      if (this._isSleepWindow() && s === 'sleeping') return false;
-      if (this._isSleepWindow() && mode !== 'work') return false;
+      // 睡眠窗口：只有 work/thinking 的人可以参与
+      if (this._isSleepWindow()) {
+        if (s === 'sleeping') return false;
+        if (mode !== 'work') return false;
+      }
+      // 非睡眠窗口：不过滤 sleeping 状态的人（CC Dev 可以唤醒他们互动）
       return Number.isFinite(a.x) && Number.isFinite(a.y);
     });
   },
@@ -2048,7 +2029,7 @@ const PixelOffice = {
       const wb = this._seats?.workspaceProps?.whiteboard;
       if (wb) {
         const x = wb.x1*T, y = wb.y1*T;
-        ctx.strokeStyle = (ev.type === 'debug_pair' || ev.type === 'cc_debug') ? '#ffcf5a' : '#00f5d4';
+        ctx.strokeStyle = (ev.type === 'debug_pair' || ev.type === 'cc_debug' || ev.type === 'tech_cc_debug') ? '#ffcf5a' : '#00f5d4';
         ctx.lineWidth = 1;
         ctx.strokeRect(x+8, y+44, 48, 30);
         ctx.beginPath();
@@ -2072,7 +2053,14 @@ const PixelOffice = {
   },
 
   _sceneEventLabel(type) {
-    const map = { chat_pair: '交流中', sync_pair: '同步中', whiteboard_pair: '白板协作', review_pair: '评审中', debug_pair: '排查中', standup_group: '短会', cc_review: 'CC评审', cc_sync: 'CC对齐', cc_debug: 'CC调Bug' };
+    const map = {
+      // Original 5 events
+      chat_pair: '交流中', sync_pair: '同步中', whiteboard_pair: '白板协作', review_pair: '评审中', debug_pair: '排查中', standup_group: '短会',
+      // CC主动触发
+      cc_review: 'CC评审', cc_sync: 'CC对齐', cc_debug: 'CC调Bug',
+      // 其他分身触发CC（双向）
+      tech_cc_review: 'CC评审', pm_cc_sync: 'CC对齐', tech_cc_debug: 'CC调Bug',
+    };
     return map[type] || '协作中';
   },
 

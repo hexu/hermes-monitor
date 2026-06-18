@@ -191,12 +191,28 @@ def _find_latest_session(profile):
 
 def _derive_status_location(profile, sess):
     """根据 session 数据推断状态和位置（按时间判断，不依赖 gateway PID）"""
-    if not sess or not sess.get("last_active"):
-        return "idle", "couch"
+    if not sess:
+        return "idle", "lounge_idle"
+
+    la = sess.get("last_active")
+
+    # last_active 为 "N/A" 或无效值时：返回 idle（休息区）
+    if not la or la == "N/A" or str(la).strip().upper() == "N/A":
+        started_at = sess.get("started_at")
+        if started_at and isinstance(started_at, (int, float)):
+            try:
+                started_dt = datetime.fromtimestamp(started_at)
+                now = datetime.now()
+                age_secs = (now - started_dt).total_seconds()
+                # session 在 30 分钟内开过，可能是刚结束 → idle
+                if age_secs < 30 * 60:
+                    return "idle", "lounge_idle"
+            except Exception:
+                pass
+        return "idle", "lounge_idle"
 
     # 解析 last_active
     try:
-        la = sess["last_active"]
         if isinstance(la, (int, float)):
             la_dt = datetime.fromtimestamp(la)
         else:
@@ -210,13 +226,14 @@ def _derive_status_location(profile, sess):
         return "working", "workstation"
     if idle_secs < 300:
         return "thinking", "workstation"
-    return "sleeping", "bedroom"
-
-
+    # idle >= 5min：睡眠窗口给 bedroom，白天给 idle（休息区）
+    now_hour = datetime.now().hour
+    if 21 <= now_hour or now_hour < 8:
+        return "sleeping", "bedroom"
+    return "idle", "lounge_idle"
 
 
 def _parse_dt(value):
-    """Parse Hermes timestamps defensively. Returns naive local datetime or None."""
     if value is None:
         return None
     try:

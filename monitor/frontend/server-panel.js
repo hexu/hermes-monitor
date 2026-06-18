@@ -39,18 +39,8 @@ const ServerPanel = {
 
   // M4: 每 5 分钟采样一次 token 到历史
   _getStatus(profile, mp) {
-    // 动态计算 status（idle 秒数驱动）
-    if (profile === 'claude-code') {
-      const lastActive = mp?.last_active;
-      if (lastActive) {
-        const idleSec = (Date.now() / 1000) - (lastActive < 1000000000000 ? lastActive : lastActive / 1000);
-        if (idleSec > 1800) return 'sleeping';
-        if (idleSec > 300) return 'idle';
-        return 'working';
-      }
-      return mp?.status || 'idle';
-    }
-    return mp?.status || 'unknown';
+    // V22：后端已统一推导 status，前端直接使用
+    return mp?.status || 'idle';
   },
 
   update(d) {
